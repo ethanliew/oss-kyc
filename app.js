@@ -1,15 +1,10 @@
 const express = require('express'),
     app = express(),
-    bodyParser = require('body-parser'),
-    debug = require('debug')('server'),
-    Promise = require('bluebird'),
-    ethClient = require('eth-client');
-
+    debug = require('debug')('server');
+ 
 app.listen(3000);
 
 app.use('/kyc/', express.static(__dirname + '/public'));
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(function(req, res, next) {
     if (res.headersSent) return next();
