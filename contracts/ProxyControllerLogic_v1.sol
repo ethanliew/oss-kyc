@@ -1,11 +1,11 @@
-pragma solidity ^0.4.8;
+pragma solidity 0.4.24;
 
 import 'zcom-contracts/contracts/VersionLogic.sol';
 import './Organizations.sol';
 import './PersonalInformations.sol';
 
 contract ProxyControllerLogic_v1 is VersionLogic {
-    function ProxyControllerLogic_v1(ContractNameService _cns) public VersionLogic (_cns, 'ProxyController') {}
+    constructor(ContractNameService _cns) public VersionLogic (_cns, 'ProxyController') {}
 
     function getNonceInOrganizations(address _organizationsAddress, address _addr) public constant returns (uint) {
         return Organizations(_organizationsAddress).nonces(_addr);

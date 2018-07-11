@@ -8,6 +8,7 @@
   "dependencies": {
     "debug": "^2.6.8",
     "express": "^4.15.3",
+    "zcom-blockchain-cp": "git+ssh://git@gitlab.thing-chain.site:blockchain/zcom-blockchain-cp.git",
     "zcom-contracts": "git+https://github.com/zcom-cloud-blockchain/solidity.git"
   }
 }

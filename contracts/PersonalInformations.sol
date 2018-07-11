@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity 0.4.24;
 
 import './Organizations.sol';
 
@@ -19,7 +19,7 @@ contract PersonalInformations {
 
     event SetPersonalInformationsEvent(address indexed user, bytes32 indexed certificationBodyKey, bytes32 dataKey, bytes32 indexed dataHash);
 
-    function PersonalInformations(Organizations _organizations) public {
+    constructor(Organizations _organizations) public {
         organizations = _organizations;
     }
 
@@ -32,11 +32,11 @@ contract PersonalInformations {
 
     function createWithSign(address _user, bytes32 _dataKey, bytes32 _dataHash, uint _expires, uint _nonce, bytes _sign) public returns (bool) {
         bytes32 hash = calcEnvHash('createWithSign');
-        hash = keccak256(hash, _user);
-        hash = keccak256(hash, _dataKey);
-        hash = keccak256(hash, _dataHash);
-        hash = keccak256(hash, _expires);
-        hash = keccak256(hash, _nonce);
+        hash = keccak256(abi.encodePacked(hash, _user));
+        hash = keccak256(abi.encodePacked(hash, _dataKey));
+        hash = keccak256(abi.encodePacked(hash, _dataHash));
+        hash = keccak256(abi.encodePacked(hash, _expires));
+        hash = keccak256(abi.encodePacked(hash, _nonce));
         address from = recoverAddress(hash, _sign);
 
         if (_nonce != nonces[from]) return false;
@@ -50,17 +50,17 @@ contract PersonalInformations {
         if (personalInformations[_user][certificationBodyKey][_dataKey].isCreated) return false;
 
         personalInformations[_user][certificationBodyKey][_dataKey] = PersonalInformation({ isCreated: true, dataHash: _dataHash, expires: _expires });
-        SetPersonalInformationsEvent(_user, certificationBodyKey, _dataKey, _dataHash);
+        emit SetPersonalInformationsEvent(_user, certificationBodyKey, _dataKey, _dataHash);
         return true;
     }
 
     function updateWithSign(address _user, bytes32 _dataKey, bytes32 _dataHash, uint _expires, uint _nonce, bytes _sign) public returns (bool) {
         bytes32 hash = calcEnvHash('updateWithSign');
-        hash = keccak256(hash, _user);
-        hash = keccak256(hash, _dataKey);
-        hash = keccak256(hash, _dataHash);
-        hash = keccak256(hash, _expires);
-        hash = keccak256(hash, _nonce);
+        hash = keccak256(abi.encodePacked(hash, _user));
+        hash = keccak256(abi.encodePacked(hash, _dataKey));
+        hash = keccak256(abi.encodePacked(hash, _dataHash));
+        hash = keccak256(abi.encodePacked(hash, _expires));
+        hash = keccak256(abi.encodePacked(hash, _nonce));
         address from = recoverAddress(hash, _sign);
 
         if (_nonce != nonces[from]) return false;
@@ -75,14 +75,14 @@ contract PersonalInformations {
 
         personalInformations[_user][certificationBodyKey][_dataKey].dataHash = _dataHash;
         personalInformations[_user][certificationBodyKey][_dataKey].expires = _expires;
-        SetPersonalInformationsEvent(_user, certificationBodyKey, _dataKey, _dataHash);
+        emit SetPersonalInformationsEvent(_user, certificationBodyKey, _dataKey, _dataHash);
         return true;
     }
 
 
     function calcEnvHash(bytes32 _functionName) public constant returns (bytes32 hash) {
-        hash = keccak256(this);
-        hash = keccak256(hash, _functionName);
+        hash = keccak256(abi.encodePacked(this));
+        hash = keccak256(abi.encodePacked(hash, _functionName));
     }
 
     function recoverAddress(bytes32 _hash, bytes _sign) public pure returns (address recoverdAddr) {

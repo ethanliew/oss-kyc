@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity 0.4.24;
 
 import 'zcom-contracts/contracts/VersionContract.sol';
 import './ProxyControllerLogic_v1.sol';
@@ -6,7 +6,7 @@ import './ProxyControllerLogic_v1.sol';
 contract ProxyController_v1 is VersionContract {
     ProxyControllerLogic_v1 public logic_v1;
 
-    function ProxyController_v1(ContractNameService _cns, ProxyControllerLogic_v1 _logic_v1) public VersionContract(_cns, 'ProxyController') {
+    constructor(ContractNameService _cns, ProxyControllerLogic_v1 _logic_v1) public VersionContract(_cns, 'ProxyController') {
         logic_v1 = _logic_v1;
     }
 

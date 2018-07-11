@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity 0.4.24;
 
 contract Organizations {
 
@@ -59,8 +59,8 @@ contract Organizations {
 
     function createOrganizationWithSign(bytes32 _organizationKey, uint _nonce, bytes _sign) public returns (bool) {
         bytes32 hash = calcEnvHash('createOrganizationWithSign');
-        hash = keccak256(hash, _organizationKey);
-        hash = keccak256(hash, _nonce);
+        hash = keccak256(abi.encodePacked(hash, _organizationKey));
+        hash = keccak256(abi.encodePacked(hash, _nonce));
         address from = recoverAddress(hash, _sign);
 
         if (_nonce != nonces[from]) return false;
@@ -71,8 +71,8 @@ contract Organizations {
 
     function createOrganizationPrivate(address _from, bytes32 _organizationKey) private returns (bool) {
         if (organizations[_organizationKey].created) return false;
-        OranizationEvent(_organizationKey, OrganizationAction.Create);
-        AdminEvent(_organizationKey, AccountAction.Add, _from);
+        emit OranizationEvent(_organizationKey, OrganizationAction.Create);
+        emit AdminEvent(_organizationKey, AccountAction.Add, _from);
         organizations[_organizationKey] = Organization({created:true, active:true, adminCount:1});
         organizations[_organizationKey].admins[_from] = true;
         adminOrganizationKeys[_from] = _organizationKey;
@@ -83,8 +83,8 @@ contract Organizations {
 
     function addMemberWithSign(address _addr, uint _nonce, bytes _sign) public returns (bool) {
         bytes32 hash = calcEnvHash('addMemberWithSign');
-        hash = keccak256(hash, _addr);
-        hash = keccak256(hash, _nonce);
+        hash = keccak256(abi.encodePacked(hash, _addr));
+        hash = keccak256(abi.encodePacked(hash, _nonce));
         address from = recoverAddress(hash, _sign);
 
         if (_nonce != nonces[from]) return false;
@@ -99,7 +99,7 @@ contract Organizations {
         if (adminOrganizationKeys[_addr] != 0 && adminOrganizationKeys[_addr] != organizationKey) return false;
         if (memberOrganizationKeys[_addr] != 0 && memberOrganizationKeys[_addr] != organizationKey) return false;
 
-        MemberEvent(organizationKey, AccountAction.Add, _addr);
+        emit MemberEvent(organizationKey, AccountAction.Add, _addr);
         organizations[organizationKey].members[_addr] = true;
         memberOrganizationKeys[_addr] = organizationKey;
         return true;
@@ -109,8 +109,8 @@ contract Organizations {
     /* ----------- recover address ----------------- */
 
     function calcEnvHash(bytes32 _functionName) public constant returns (bytes32 hash) {
-        hash = keccak256(this);
-        hash = keccak256(hash, _functionName);
+        hash = keccak256(abi.encodePacked(this));
+        hash = keccak256(abi.encodePacked(hash, _functionName));
     }
 
     function recoverAddress(bytes32 _hash, bytes _sign)  public pure returns (address recoverdAddr) {
